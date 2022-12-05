@@ -39,7 +39,7 @@ get_word.previous_word = ''
 
 
 def is_correct_words(word):
-    return word[-1].isalpha() and word[-1] not in ('ь', 'ъ')
+    return word[-1].isalpha()
 
 
 words_know = find_words()
