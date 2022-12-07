@@ -16,7 +16,7 @@ def find_words(file='RUS.txt'):
 
 def get_word(words):
     normilize_word = words.strip().lower()[1:]
-    if normilize_word[-1] in ('ь', 'ъ'):
+    if normilize_word[-1] in ('ь', 'ъ') and len(normilize_word) < 3:
         normilize_word = normilize_word.strip().lower()[:-1]
     if is_correct_words(normilize_word):
         if (get_word.previous_word != '' and
