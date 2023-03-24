@@ -1,55 +1,51 @@
-# Игра в слова 0.1
+import random
 
-def find_words(file='RUS.txt'):
-    try:
-        word = open('RUS.txt', 'r')
-        words = []
-        for i in word:
-            words.append(i)
-    except Exception as err:
-        print(err)
-        return None
-    finally:
-        word.close()
-        return [line.rstrip() for line in words]
+from russian import words
+
+words_already_named = ['лл']
+pre_word = ''
+happy_msg = (
+    'Отлично, такое слово есть!',
+    'Вау, у нас тут знаток слов!',
+    'Может быть хватит!? Отгадывать мои слова :)',
+    'О как великолепно, когда слово есть!:)',
+    'И-и-и-и.....',
+    'Барабанная дробь *_*_*_ и:',
+    'Н-у-у-у, это правильное слово!',
+    'Угадайка-отгадайка!',
+    'Белиссимо-словисимо! Правильно :)',
+    'Ты-ы-ы-ы просто чудо!^)'
+)
 
 
-def get_word(words):
-    normilize_word = words.strip().lower()[1:]
-    if normilize_word[-1] in ('ь', 'ъ') and len(normilize_word) < 3:
-        normilize_word = normilize_word.strip().lower()[:-1]
-    if is_correct_words(normilize_word):
-        if (get_word.previous_word != '' and
-           normilize_word[0] != get_word.previous_word[-1]):
-            return 'Слово должно начинаться {0}'.format(
-                get_word.previous_word[-1]
-                )
+def happy_say(word: str, words=words) -> str:
+    '''Сообщения для пользователя'''
+    player_word = word.rstrip().lower()
+    if words.get(player_word):
+        return random.choice(happy_msg)
 
-        if normilize_word not in words_already_named:
-            words_already_named.add(normilize_word)
-            last_letter_word = normilize_word.capitalize()[-1]
-            return f'Следующее слово на {last_letter_word}'
-        else:
-            return 'Слово уже было. Повторите попытку'
+
+def check_word(word: str, words=words) -> str:
+    '''Игра в слова'''
+    player_word = word.rstrip().lower()
+    if words.get(player_word):
+        if player_word[-1] in ('ь', 'ъ') and len(player_word) > 3:
+            if player_word not in words_already_named:
+                words_already_named.append(player_word)
+                words_already_named.append(player_word[:-1])
+                last_letter = player_word.upper()[-2]
+                return 'Следующее слово должно начинаться на ' + '"' + last_letter + '"'
+        if words_already_named and player_word[-1] not in ('ь', 'ъ'):
+            if player_word[0] != words_already_named[-1][-1]:
+                return 'Но-но, по-легче! Слово должно начинаться букву "{0}"!'.format(words_already_named[-1][-1].upper())
+            else:
+                if player_word not in words_already_named:
+                    words_already_named.append(player_word)
+                    last_letter = player_word.upper()[-1]
+                    return 'Следующее слово должно начинаться на ' + '"' + last_letter + '"'
+                else:
+                    return 'Слово уже было. Повторите попытку'
     else:
-        return 'Некорректное название слова. Повторите попытку'
-
-
-get_word.previous_word = ''
-
-
-def is_correct_words(word):
-    return word[-1].isalpha()
-
-
-words_know = find_words()
-words_already_named = set()
-
-# Функция для бота дискорд
-# async def on_message(message):
-#   channel = message.channel
-#   if message.author == bot.user:
-#     return
-#   if message.content.startswith('+'):
-#     response = get_word(message.content)
-#     await message.channel.send(response)
+        return (
+            f'Сам ты "{player_word.upper()}".'
+            f'Такого слова нет в моем словаре, придумай другое!')
